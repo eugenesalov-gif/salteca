@@ -1,0 +1,9 @@
+# Артефакты сборки и упаковки
+build/
+dist/
+
+# Xcode
+xcuserdata/
+*.xcuserstate
+DerivedData/
+.DS_Store
