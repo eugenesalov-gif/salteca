@@ -396,7 +396,13 @@ nonisolated final class AutoModeService: @unchecked Sendable {
         }
 
         // Вставляем исправление через буфер, сохраняя буфер пользователя (урок №5).
+        // Восстановление гарантируем через defer, симметрично хоткей-пути в
+        // TextCaptureService: настоящий (текстовый) буфер пользователя вернётся,
+        // что бы ни случилось. Не-текстовое/пустое содержимое восстановить нечем
+        // (readString даёт nil) — там останется наш временный текст, как и в
+        // хоткей-пути; это осознанное ограничение.
         let clipboardBackup = Clipboard.readString()
+        defer { if let clipboardBackup { Clipboard.write(clipboardBackup) } }
         Clipboard.write(c.fixed)
         Thread.sleep(forTimeInterval: copySettle)
         // Границей корректируемого слова мог быть знак, набираемый с Shift ('?' =
@@ -407,12 +413,13 @@ nonisolated final class AutoModeService: @unchecked Sendable {
         SyntheticKeyboard.waitForModifiersReleased()
         SyntheticKeyboard.commandV()
         Thread.sleep(forTimeInterval: pasteSettle)
-        if let clipboardBackup { Clipboard.write(clipboardBackup) }
 
         typeBoundary(c.boundary)
 
         replacementStore.record(original: c.word, fixed: c.fixed, direction: c.direction)
+        #if DEBUG
         print("[auto] \(c.word) -> \(c.fixed)")
+        #endif
     }
 
     private func typeBoundary(_ boundary: AutoModeEngine.Boundary) {

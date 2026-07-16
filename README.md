@@ -19,6 +19,26 @@ that does exactly one thing and does it invisibly.
 It's a port and evolution of my own Python prototype into native Swift — for
 speed, robust access to system APIs, and distribution as a single `.app`.
 
+## Privacy
+
+Salteca is built to keep what you type on your machine:
+
+- **No network access.** The app never connects to the internet. There is no
+  `URLSession`, HTTP client, socket, or any networking code anywhere in the
+  source, and no network entitlement is even requested.
+- **Nothing you type is written to disk.** The text you type — and the words
+  captured and corrected — is never saved to any file, log, or `UserDefaults`.
+  The only persisted data is app configuration (chosen hotkey, switch sound,
+  and a saved alert-volume value for restoration). The last correction is held
+  in memory only (to support the toggle/revert), and is lost on quit.
+- **Your clipboard is preserved.** Correction is applied via the clipboard, so
+  the app saves your real clipboard first and restores it via `defer` on every
+  path in both the hotkey and auto-mode flows. This is guaranteed for **text**
+  clipboard contents. It is **not** guaranteed for non-text contents (images,
+  files) or an empty clipboard — in that case there is no string to read back,
+  so the original content is not restored (this matches the original Python
+  prototype's behavior).
+
 ## Features
 
 - **Auto mode** — corrects words as you type, in the background, no hotkey needed.

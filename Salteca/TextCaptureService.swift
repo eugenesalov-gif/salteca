@@ -116,7 +116,9 @@ nonisolated final class TextCaptureService: @unchecked Sendable {
         }
 
         replacementStore.record(original: word, fixed: fixed, direction: direction)
+        #if DEBUG
         print("\(word) -> \(fixed)")
+        #endif
     }
 
     // MARK: - Определение активного выделения
